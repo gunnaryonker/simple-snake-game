@@ -16,6 +16,8 @@ pygame.display.set_caption("Snake Game")
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 
 # Snake class
 class Snake:
@@ -23,7 +25,7 @@ class Snake:
         self.length = 1
         self.positions = [(screen_width / 2, screen_height / 2)]
         self.direction = (0, 0)  # Initialize direction as a tuple
-        self.color = WHITE
+        self.color = GREEN
 
     def get_head_position(self):
         return self.positions[0]
@@ -35,15 +37,20 @@ class Snake:
             self.direction = point
 
     def move(self):
-        x, y = self.direction  # Unpack direction tuple here
+        x, y = self.direction
         cur = self.get_head_position()
-        new = (((cur[0] + (x * cell_size)) % screen_width), (cur[1] + (y * cell_size)) % screen_height)
-        if len(self.positions) > 2 and new in self.positions[2:]:
-            self.reset()
+        new = (cur[0] + (x * cell_size), cur[1] + (y * cell_size))
+        
+        # Check if the new position is outside the screen boundaries
+        if new[0] < 0 or new[0] >= screen_width or new[1] < 0 or new[1] >= screen_height:
+            self.reset()  # Reset the snake if it hits the edge
         else:
-            self.positions.insert(0, new)
-            if len(self.positions) > self.length:
-                self.positions.pop()
+            if len(self.positions) > 2 and new in self.positions[2:]:
+                self.reset()
+            else:
+                self.positions.insert(0, new)
+                if len(self.positions) > self.length:
+                    self.positions.pop()
 
     def reset(self):
         self.length = 1
@@ -76,7 +83,7 @@ class Snake:
 class Fruit:
     def __init__(self):
         self.position = (0, 0)
-        self.color = WHITE
+        self.color = RED
         self.randomize_position()
 
     def randomize_position(self):
@@ -100,6 +107,11 @@ def main():
         snake.handle_keys()
         snake.move()
 
+        # Game over condition: Check if the snake collides with the edges of the window
+        if (snake.get_head_position()[0] < 0 or snake.get_head_position()[0] >= screen_width or
+            snake.get_head_position()[1] < 0 or snake.get_head_position()[1] >= screen_height):
+            pygame.quit()
+
         if snake.get_head_position() == fruit.position:
             snake.length += 1
             fruit.randomize_position()
@@ -108,6 +120,7 @@ def main():
         fruit.draw(screen)
         pygame.display.update()
         clock.tick(10)
+
 
 if __name__ == "__main__":
     main()
