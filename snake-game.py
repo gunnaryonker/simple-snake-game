@@ -56,6 +56,8 @@ class Snake:
         self.length = 1
         self.positions = [(screen_width / 2, screen_height / 2)]
         self.direction = (0, 0)
+        global score
+        score = 0
 
     def draw(self, surface):
         for p in self.positions:
@@ -96,9 +98,14 @@ class Fruit:
 
 # Main function
 def main():
+    # Score counter
+    global score
+    score = 0
     # Initialize game objects
     snake = Snake()
     fruit = Fruit()
+
+    font = pygame.font.Font(None, 36)
 
     clock = pygame.time.Clock()
 
@@ -114,10 +121,15 @@ def main():
 
         if snake.get_head_position() == fruit.position:
             snake.length += 1
+            score += 1
             fruit.randomize_position()
 
         snake.draw(screen)
         fruit.draw(screen)
+
+        score_text = font.render("Score: " + str(score), True, WHITE)
+        screen.blit(score_text, (10, 10))
+
         pygame.display.update()
         clock.tick(10)
 
